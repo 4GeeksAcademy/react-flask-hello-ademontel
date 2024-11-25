@@ -65,16 +65,6 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
-#signup endpoint
-@app.route('/signup', methods=['POST'])
-def register():
-    body = request.json
-    username = body.get('username')
-    email = body.get('email')
-    password = body.get('password')
-    return jsonify({"msg" : "User created successfully"}), 201
-
-
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
