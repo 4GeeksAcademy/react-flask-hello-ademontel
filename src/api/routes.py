@@ -5,6 +5,10 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+
 
 api = Blueprint('api', __name__)
 
@@ -28,7 +32,36 @@ def signup():
     name = data.get('name')
     email = data.get('email')
     password = data.get('password')
-    new_user = User(name, email, password)
+
+    existing_user = User.query.filter((User.email == email)).first()
+    if existing_user:
+        return jsonify({"msg": "User already exists"}), 401
+
+    new_user = User(name=name, email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
+
     return jsonify({"message": "User created successfully!"}), 201
+
+@api.route("/login", methods=["POST"])
+def login():
+    body = request.json
+    email = body.get("email", None)
+    password = body.get("password", None)
+
+    user = User.query.filter_by(email=email).one_or_none()
+    if user == None:
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    if user.password != password:
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token), 201
+
+@api.route("/protected", methods=["GET"])
+@jwt_required()
+def protected():
+    # Access the identity of the current user with get_jwt_identity
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
