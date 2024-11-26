@@ -26,8 +26,8 @@ export const Login = () => {
             }
 
             const data = await response.json();
-            localStorage.setItem("token", data.access_token); // Guardar el token
-            window.location.href = "/"; // Redirigir al inicio
+            localStorage.setItem("token", data.access_token); 
+            window.location.href = "/private"; 
         } catch (error) {
             setError("Error inesperado al iniciar sesión");
         }
@@ -59,7 +59,7 @@ export const Login = () => {
                         className="form-control"
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(event) => setPassword(event.target.value)}
                         required
                     />
                 <label htmlFor="password" className="form-label">Password</label>
