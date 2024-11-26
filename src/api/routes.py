@@ -5,9 +5,8 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+
 
 
 api = Blueprint('api', __name__)
@@ -36,6 +35,9 @@ def signup():
     existing_user = User.query.filter((User.email == email)).first()
     if existing_user:
         return jsonify({"msg": "User already exists"}), 401
+    
+    if name == None:
+        name = "Unknown"
 
     new_user = User(name=name, email=email, password=password)
     db.session.add(new_user)
@@ -49,7 +51,7 @@ def login():
     email = body.get("email", None)
     password = body.get("password", None)
 
-    user = User.query.filter_by(email=email).one_or_none()
+    user = User.query.filter_by(email=email).first()
     if user == None:
         return jsonify({"msg": "Bad email or password"}), 401
 
@@ -65,3 +67,15 @@ def protected():
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+@api.route("/me", methods=["GET"])
+@jwt_required()
+def get_current_user():
+    current_user = get_jwt_identity()  
+    user = User.query.filter_by(email=current_user).first()
+    if user:
+        return jsonify({
+            "email": user.email,
+            "name": user.name
+        }), 200
+    return jsonify({"msg": "User not found"}), 404

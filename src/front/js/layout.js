@@ -4,13 +4,13 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 import { Home } from "./pages/home";
-import { Demo } from "./pages/demo";
-import { Single } from "./pages/single";
-import { Sign } from "./pages/sign";
+import { Login } from "./pages/login";
+import { Signup } from "./pages/signup";
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import ProtectedRoute from "./component/protectedRoute";
 
 //create your first component
 const Layout = () => {
@@ -26,11 +26,17 @@ const Layout = () => {
                 <ScrollToTop>
                     <Navbar />
                     <Routes>
-                        <Route element={<Home />} path="/" />
-                        <Route element={<Demo />} path="/demo" />
-                        <Route element={<Single />} path="/single/:theid" />
+                        <Route element={<Login />} path="/login" />
+                        <Route element={<Signup />} path="/signup" />
+                        <Route element={
+                            <ProtectedRoute>
+                                <Home />
+                            </ProtectedRoute>} 
+                        path="/" />
+           
+                        {/*<Route element={<Single />} path="/single/:theid" /> */}
                         <Route element={<h1>Not found!</h1>} />
-                        <Route element={<Sign />} path="/sign" />
+                        
                     </Routes>
                     <Footer />
                 </ScrollToTop>

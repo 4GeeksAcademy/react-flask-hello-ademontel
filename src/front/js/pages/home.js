@@ -1,14 +1,58 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
+	const [user, setUser] = useState(null);
+    const [error, setError] = useState("");
 
+	useEffect(() => {
+		const fetchUser = async () => {
+			const token = localStorage.getItem("token");
+
+			if (!token) {
+				setError("Token not found. You must login first!");
+				return;
+			}
+
+			try {
+                const response = await fetch(`${process.env.BACKEND_URL}api/me`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`, 
+                    },
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    setError(data.msg || "Failed to fetch user identity.");
+                    return;
+                }
+
+                const data = await response.json();
+                setUser(data);
+            } catch (err) {
+                setError("Unexpected error occurred.");
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (!user) {
+        return <div>Loading...</div>;
+    }
+	
 	return (
 		<div className="text-center mt-5">
-			<h1>Hello Rigo!!</h1>
+			<h1>Hello {user.name}!!</h1>
 			<p>
 				<img src={rigoImageUrl} />
 			</p>
