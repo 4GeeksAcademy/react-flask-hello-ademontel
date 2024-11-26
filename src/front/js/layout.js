@@ -4,6 +4,7 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 import { Home } from "./pages/home";
+import { Private } from "./pages/private";
 import { Login } from "./pages/login";
 import { Signup } from "./pages/signup";
 import injectContext from "./store/appContext";
@@ -33,6 +34,11 @@ const Layout = () => {
                                 <Home />
                             </ProtectedRoute>} 
                         path="/" />
+                        <Route element={
+                            <ProtectedRoute>
+                                <Private />
+                            </ProtectedRoute>} 
+                        path="/private" />
            
                         {/*<Route element={<Single />} path="/single/:theid" /> */}
                         <Route element={<h1>Not found!</h1>} />
